@@ -1,0 +1,200 @@
+/* Variables Globales y Reset */
+:root {
+    --primary-color: #34495e;
+    --accent-color: #3498db;
+    --bg-color: #f4f6f9;
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --white: #ffffff;
+    --success: #2ecc71;
+    --danger: #e74c3c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar */
+.top-navbar {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-navbar h2 { font-size: 1.2rem; font-weight: 500; }
+
+/* Layout Principal */
+.main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: var(--white);
+    padding-top: 20px;
+}
+
+.sidebar ul { list-style: none; }
+
+.sidebar li {
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #34495e;
+    color: #bdc3c7;
+}
+
+.sidebar li.active {
+    background-color: var(--accent-color);
+    color: var(--white);
+    font-weight: bold;
+}
+
+.sidebar li.alert-menu { color: #e74c3c; }
+
+/* Contenido Central */
+.content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Tarjetas Dashboard */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: 5px;
+    border-top: 4px solid var(--accent-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.card-title {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.card h3 { font-size: 2rem; margin-top: 10px; }
+.success-text { color: var(--success); }
+.danger-text { color: var(--danger); }
+
+/* Mapa */
+.map-wrapper {
+    height: 400px;
+    background: var(--white);
+    border-radius: 5px;
+    padding: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tabla */
+.table-wrapper {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.table-wrapper h3 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--bg-color);
+    padding-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+th { background-color: #f8f9fa; color: var(--text-light); }
+tr:hover { background-color: #f1f4f6; cursor: pointer; }
+
+/* Panel Derecho */
+.right-panel {
+    width: 300px;
+    background-color: var(--white);
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 15px;
+}
+
+.panel-header h3 { font-size: 1rem; }
+
+.panel-content { padding: 20px; }
+.detail-group { margin-bottom: 25px; }
+.detail-group h4 { font-size: 0.85rem; color: var(--text-light); margin-bottom: 5px; }
+.detail-group p, .detail-group ul { font-size: 0.95rem; }
+.detail-group ul { padding-left: 20px; }
+
+/* EL TRUCO: Gráfico de barras hecho SOLO con CSS */
+.pure-css-chart-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+    border-bottom: 2px solid var(--text-light);
+    border-left: 2px solid var(--text-light);
+    padding-left: 5px;
+    margin-top: 10px;
+}
+
+.css-bar {
+    flex: 1;
+    background-color: var(--accent-color);
+    border-radius: 3px 3px 0 0;
+    transition: height 0.3s ease;
+}
+
+.css-bar:hover { background-color: var(--primary-color); }
+.chart-label { text-align: center; font-size: 0.8rem; margin-top: 5px; color: var(--text-light); }

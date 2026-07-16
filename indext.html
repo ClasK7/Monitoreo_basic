@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Gestión Ambiental</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <nav class="top-navbar">
+        <div class="menu-icon">☰</div>
+        <h2>Plataforma de Gestión y Monitoreo Ambiental OpenAQ (Vanilla JS)</h2>
+        <div class="user-profile">🔔 👤</div>
+    </nav>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <ul>
+                <li class="active">📊 Dashboard</li>
+                <li>📈 Gráfico en línea</li>
+                <li>💳 Tarjetas IoT</li>
+                <li>📋 Tablas de datos</li>
+                <li class="alert-menu">⚠️ Alertas Activas</li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="dashboard-cards">
+                <div class="card">
+                    <span class="card-title">Total de Dispositivos</span>
+                    <h3 id="total-devices">0</h3>
+                </div>
+                <div class="card">
+                    <span class="card-title">Promedio Global del Aire</span>
+                    <h3 class="success-text">52 <small>índice</small></h3>
+                </div>
+                <div class="card">
+                    <span class="card-title">Alertas Activas (Ref: 🔴)</span>
+                    <h3 class="danger-text" id="total-alerts">0</h3>
+                </div>
+            </div>
+
+            <div class="map-wrapper">
+                <div id="map">Cargando mapa...</div>
+            </div>
+
+            <div class="table-wrapper">
+                <h3>TABLA DE DISPOSITIVOS IoT</h3>
+                <table id="device-table">
+                    <thead>
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Ubicación</th>
+                            <th>País</th>
+                            <th>Última Transmisión</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        </tbody>
+                </table>
+            </div>
+        </main>
+
+        <aside class="right-panel" id="side-panel">
+            <div class="panel-header">
+                <h3>DETALLES DE LA UBICACIÓN</h3>
+            </div>
+            <div class="panel-content" id="panel-details">
+                <p class="placeholder-text">Selecciona un marcador en el mapa o en la tabla para ver los detalles.</p>
+            </div>
+        </aside>
+    </div>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPiibj5tq0cloahKf1km4p9j361spYwx0&callback=initMap"></script>
+
+    <script>
+        let map;
+        let globalLocations = [];
+        const OPENAQ_API_KEY = "8b9668b0efee71fb9fd9f6744aca66a048aa1f5557cd3773e647306e04584d3a"; // REEMPLAZA CON TU CLAVE DE OPENAQ
+
+        // 1. Inicializar el Mapa (Requerido por Google)
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 0, lng: 0 },
+                zoom: 2,
+                styles: [ /* Estilo oscuro básico opcional se puede inyectar aquí */ ]
+            });
+            fetchData();
+        }
+
+        // 2. Consumir la API usando JS Puro (fetch)
+        async function fetchData() {
+            try {
+                const response = await fetch("https://api.openaq.org/v3/locations?limit=25", {
+                    headers: { 'X-API-Key': OPENAQ_API_KEY }
+                });
+                const data = await response.json();
+                
+                if(data.results && data.results.length > 0) {
+                    globalLocations = data.results.filter(loc => loc.coordinates);
+                } else {
+                    cargarDatosMock();
+                }
+            } catch (error) {
+                console.error("Error consumiendo la API, cargando respaldo...", error);
+                cargarDatosMock();
+            }
+            renderDashboard();
+        }
+
+        function cargarDatosMock() {
+            globalLocations = [
+                { id: 1, name: "Estación Norte", country: { name: "Ecuador" }, coordinates: { latitude: -0.2298, longitude: -78.5249 }, datetimeLast: { utc: new Date().toISOString() }, sensors: [{ parameter: { displayName: "PM2.5", units: "µg/m³" } }] },
+                { id: 2, name: "Nodo Centro", country: { name: "Ecuador" }, coordinates: { latitude: -1.0286, longitude: -79.4635 }, datetimeLast: { utc: "2024-01-01T00:00:00Z" }, sensors: [{ parameter: { displayName: "CO2", units: "ppm" } }] }
+            ];
+        }
+
+        // 3. Renderizar todos los elementos en el DOM
+        function renderDashboard() {
+            document.getElementById("total-devices").innerText = globalLocations.length;
+            
+            let alertas = 0;
+            const tbody = document.getElementById("table-body");
+            tbody.innerHTML = "";
+
+            globalLocations.forEach(loc => {
+                // Generar Marcador en el Mapa
+                const marker = new google.maps.Marker({
+                    position: { lat: loc.coordinates.latitude, lng: loc.coordinates.longitude },
+                    map: map,
+                    title: loc.name
+                });
+                marker.addListener("click", () => mostrarDetalles(loc));
+
+                // Lógica de estado
+                const lastUpdate = new Date(loc.datetimeLast?.utc);
+                const diffHrs = (new Date() - lastUpdate) / (1000 * 60 * 60);
+                let estadoHTML = `<span class="status green">🟢 Activo</span>`;
+                
+                if (diffHrs > 24) {
+                    estadoHTML = `<span class="status red">🔴 Inactivo</span>`;
+                    alertas++;
+                }
+
+                // Inyectar Fila en la Tabla
+                const tr = document.createElement("tr");
+                tr.onclick = () => mostrarDetalles(loc);
+                tr.innerHTML = `
+                    <td>#${loc.id}</td>
+                    <td>${loc.name}</td>
+                    <td>${loc.country?.name || "N/A"}</td>
+                    <td>${new Date(loc.datetimeLast?.utc).toLocaleString()}</td>
+                    <td>${estadoHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("total-alerts").innerText = alertas;
+        }
+
+        // 4. Panel lateral y Gráficos creados SOLO CON CSS (Sin librerías)
+        function mostrarDetalles(loc) {
+            const panel = document.getElementById("panel-details");
+            
+            // Generamos alturas aleatorias para simular el gráfico de 7 barras sin usar Chart.js
+            const barrasCSS = Array.from({length: 7}).map(() => {
+                const altura = Math.floor(Math.random() * 100) + 10;
+                return `<div class="css-bar" style="height: ${altura}%;" title="${altura}%"></div>`;
+            }).join('');
+
+            const sensoresHTML = loc.sensors ? loc.sensors.map(s => `<li>${s.parameter.displayName} (${s.parameter.units})</li>`).join('') : "<li>Sin sensores reportados</li>";
+
+            panel.innerHTML = `
+                <div class="detail-group">
+                    <h4>UBICACIÓN:</h4>
+                    <p>${loc.name}, ${loc.country?.name || "Desconocido"}</p>
+                </div>
+                <div class="detail-group">
+                    <h4>SENSORES DISPONIBLES:</h4>
+                    <ul>${sensoresHTML}</ul>
+                </div>
+                
+                <div class="detail-group">
+                    <h4>GRÁFICOS RESUMIDOS (Histórico Puro CSS):</h4>
+                    <div class="pure-css-chart-container">
+                        ${barrasCSS}
+                    </div>
+                    <p class="chart-label">Últimas lecturas (Mocked)</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
