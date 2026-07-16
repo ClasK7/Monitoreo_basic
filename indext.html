@@ -126,7 +126,6 @@
             tbody.innerHTML = "";
 
             globalLocations.forEach(loc => {
-                // Generar Marcador en el Mapa
                 const marker = new google.maps.Marker({
                     position: { lat: loc.coordinates.latitude, lng: loc.coordinates.longitude },
                     map: map,
