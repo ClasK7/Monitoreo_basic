@@ -1,18 +1,20 @@
-# Plataforma de Gestión y Monitoreo Ambiental OpenAQ
+# Plataforma de Gestión y Monitoreo Ambiental (Maqueta Estática)
 
 ## Descripción del Proyecto
-Este dashboard interactivo permite visualizar y gestionar información de estaciones de monitoreo ambiental a nivel global. El sistema consume la API pública de OpenAQ V3 para extraer datos telemétricos en tiempo real y los ubica geográficamente mediante la API de Google Maps.
+Este proyecto es una maqueta web (mockup) estática para un dashboard de monitoreo ambiental. La interfaz ha sido diseñada para visualizar la disposición teórica de estaciones de monitoreo, métricas globales de la calidad del aire (basadas en la estructura de datos de OpenAQ), y el estado de la red IoT. 
 
 ## Cumplimiento Estricto de Restricciones (Rúbrica)
-De acuerdo a las restricciones especificadas en la rúbrica de evaluación, este proyecto fue desarrollado bajo una arquitectura estrictamente **Vanilla**:
-- **Cero Frameworks JS:** No se utilizó React, Vue.js ni Angular. Toda la manipulación del DOM y el estado de la aplicación se gestiona con JavaScript Puro (Vanilla JS).
-- **Cero Librerías Externas:** No se incluyeron librerías como Axios o jQuery. Las peticiones HTTP asíncronas se resuelven utilizando la API nativa `fetch()`.
-- **Cero Librerías Gráficas:** Para cumplir con la restricción de "Solo HTML y CSS", la simulación de los gráficos de barras en el panel lateral se desarrolló creando contenedores dinámicos utilizando exclusivamente propiedades de CSS (Flexbox y cálculo de alturas en porcentajes), evitando el uso de herramientas como Chart.js.
-- **Diseño sin Bootstrap:** La estructura de la interfaz (Sidebar, Cards, Tablas) fue construida desde cero con CSS Grid y Flexbox.
+Para alinearse de manera estricta con las indicaciones académicas de este entregable, el proyecto fue desarrollado bajo las siguientes restricciones de diseño puro:
+- **Solo HTML y CSS (Cero JavaScript):** La estructura y el diseño se construyeron sin ningún tipo de lógica de programación, frameworks (React/Vue) ni scripts nativos (Vanilla JS).
+- **Cero Librerías Externas de Estilos:** No se utilizaron frameworks CSS como Bootstrap o Tailwind. Toda la responsividad y disposición del panel (Sidebar, Cards, Tablas) fue construida desde cero utilizando propiedades nativas como **CSS Grid** y **Flexbox**.
+- **Visualización Geográfica Estática:** En lugar de consumir la API interactiva de Google Maps mediante JavaScript, se integró un componente `<iframe>` embebido estático que cumple con el requerimiento visual sin romper la regla de no usar scripts.
+- **Gráficos Puros en CSS:** Para el requerimiento de los gráficos resumidos (histórico de 24h), se diseñó un contenedor de barras simuladas utilizando únicamente divisiones (`<div>`) con porcentajes de altura aplicados directamente por estilos CSS, descartando por completo librerías como Chart.js.
+
+## Estructura de Archivos
+- `index.html`: Contiene toda la semántica web, el esqueleto del panel y los datos insertados manualmente (hardcodeados) para simular la vista del usuario final.
+- `styles.css`: Contiene las reglas de diseño, variables de color, tipografía y la estructura de grillas para organizar el dashboard.
 
 ## Instrucciones de Uso
-1. Clonar el repositorio o extraer los archivos en una carpeta local.
-2. Abrir el archivo `index.html` en cualquier navegador web moderno (Chrome, Edge, Firefox).
-3. No requiere instalación de dependencias (`npm install`) ni servidores de desarrollo locales (`npm run dev`) debido a su naturaleza nativa.
-
-*Nota: Para el correcto funcionamiento geográfico, se requiere una conexión activa a internet para contactar los scripts de Google Maps y la red de OpenAQ.*
+1. Extraer los archivos (`index.html` y `styles.css`) en un directorio local.
+2. Hacer doble clic sobre el archivo `index.html` para abrirlo en cualquier navegador web moderno (Chrome, Edge, Firefox, Safari).
+3. Al ser un diseño 100% estático, **no requiere** de un servidor local, instalación de dependencias ni conexión activa a APIs externas para su renderizado principal.
