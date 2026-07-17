@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma de Gestión Ambiental</title>
+    <title>Plataforma de Gestión Ambiental (Diseño Estático)</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+    <!-- Barra de Navegación Superior -->
     <nav class="top-navbar">
         <div class="menu-icon">☰</div>
-        <h2>Plataforma de Gestión y Monitoreo Ambiental OpenAQ (Vanilla JS)</h2>
+        <h2>Plataforma de Gestión y Monitoreo Ambiental (Maqueta HTML/CSS)</h2>
         <div class="user-profile">🔔 👤</div>
     </nav>
 
     <div class="main-layout">
+        <!-- Menú Lateral -->
         <aside class="sidebar">
             <ul>
                 <li class="active">📊 Dashboard</li>
@@ -25,11 +27,13 @@
             </ul>
         </aside>
 
+        <!-- Contenido Central -->
         <main class="content">
+            <!-- Tarjetas Superiores (Datos estáticos) -->
             <div class="dashboard-cards">
                 <div class="card">
                     <span class="card-title">Total de Dispositivos</span>
-                    <h3 id="total-devices">0</h3>
+                    <h3>25</h3>
                 </div>
                 <div class="card">
                     <span class="card-title">Promedio Global del Aire</span>
@@ -37,14 +41,24 @@
                 </div>
                 <div class="card">
                     <span class="card-title">Alertas Activas (Ref: 🔴)</span>
-                    <h3 class="danger-text" id="total-alerts">0</h3>
+                    <h3 class="danger-text">5</h3>
                 </div>
             </div>
 
+            <!-- Contenedor del Mapa (Usando un iframe estático de Google Maps sin API Key) -->
             <div class="map-wrapper">
-                <div id="map">Cargando mapa...</div>
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15959.03367123689!2d-79.4635!3d-1.0286!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2sec!4v1700000000000!5m2!1ses!2sec" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0; border-radius: 3px;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
             </div>
 
+            <!-- Tabla de Dispositivos (Datos ingresados manualmente) -->
             <div class="table-wrapper">
                 <h3>TABLA DE DISPOSITIVOS IoT</h3>
                 <table id="device-table">
@@ -57,139 +71,80 @@
                             <th>Estado</th>
                         </tr>
                     </thead>
-                    <tbody id="table-body">
-                        </tbody>
+                    <tbody>
+                        <!-- Fila 1 -->
+                        <tr>
+                            <td>#3</td>
+                            <td>NMA - Nima</td>
+                            <td>Ghana</td>
+                            <td>15/7/2026, 8:15:25 p. m.</td>
+                            <td><span class="status green">🟢 Activo</span></td>
+                        </tr>
+                        <!-- Fila 2 -->
+                        <tr>
+                            <td>#4</td>
+                            <td>NMT - Nima</td>
+                            <td>Ghana</td>
+                            <td>15/7/2026, 8:10:10 p. m.</td>
+                            <td><span class="status green">🟢 Activo</span></td>
+                        </tr>
+                        <!-- Fila 3 -->
+                        <tr>
+                            <td>#5</td>
+                            <td>JTA - Jamestown</td>
+                            <td>Ghana</td>
+                            <td>31/12/2023, 7:00:00 p. m.</td>
+                            <td><span class="status red">🔴 Inactivo</span></td>
+                        </tr>
+                        <!-- Fila 4 -->
+                        <tr>
+                            <td>#6</td>
+                            <td>Estación UTEQ (Simulación)</td>
+                            <td>Ecuador</td>
+                            <td>15/7/2026, 8:12:05 p. m.</td>
+                            <td><span class="status green">🟢 Activo</span></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </main>
 
-        <aside class="right-panel" id="side-panel">
+        <!-- Panel Lateral Derecho (Detalles pre-llenados) -->
+        <aside class="right-panel">
             <div class="panel-header">
                 <h3>DETALLES DE LA UBICACIÓN</h3>
             </div>
-            <div class="panel-content" id="panel-details">
-                <p class="placeholder-text">Selecciona un marcador en el mapa o en la tabla para ver los detalles.</p>
-            </div>
-        </aside>
-    </div>
-
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPiibj5tq0cloahKf1km4p9j361spYwx0&callback=initMap"></script>
-
-    <script>
-        let map;
-        let globalLocations = [];
-        const OPENAQ_API_KEY = "8b9668b0efee71fb9fd9f6744aca66a048aa1f5557cd3773e647306e04584d3a"; // REEMPLAZA CON TU CLAVE DE OPENAQ
-
-        // 1. Inicializar el Mapa (Requerido por Google)
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 0, lng: 0 },
-                zoom: 2,
-                styles: [ /* Estilo oscuro básico opcional se puede inyectar aquí */ ]
-            });
-            fetchData();
-        }
-
-        // 2. Consumir la API usando JS Puro (fetch)
-        async function fetchData() {
-            try {
-                const response = await fetch("/api-openaq/v3/locations?limit=25", {
-                    headers: { 'X-API-Key': OPENAQ_API_KEY }
-                });
-                const data = await response.json();
-                
-                if(data.results && data.results.length > 0) {
-                    globalLocations = data.results.filter(loc => loc.coordinates);
-                } else {
-                    cargarDatosMock();
-                }
-            } catch (error) {
-                console.error("Error consumiendo la API, cargando respaldo...", error);
-                cargarDatosMock();
-            }
-            renderDashboard();
-        }
-
-        function cargarDatosMock() {
-            globalLocations = [
-                { id: 1, name: "Estación Norte", country: { name: "Ecuador" }, coordinates: { latitude: -0.2298, longitude: -78.5249 }, datetimeLast: { utc: new Date().toISOString() }, sensors: [{ parameter: { displayName: "PM2.5", units: "µg/m³" } }] },
-                { id: 2, name: "Nodo Centro", country: { name: "Ecuador" }, coordinates: { latitude: -1.0286, longitude: -79.4635 }, datetimeLast: { utc: "2024-01-01T00:00:00Z" }, sensors: [{ parameter: { displayName: "CO2", units: "ppm" } }] }
-            ];
-        }
-
-        // 3. Renderizar todos los elementos en el DOM
-        function renderDashboard() {
-            document.getElementById("total-devices").innerText = globalLocations.length;
-            
-            let alertas = 0;
-            const tbody = document.getElementById("table-body");
-            tbody.innerHTML = "";
-
-            globalLocations.forEach(loc => {
-                const marker = new google.maps.Marker({
-                    position: { lat: loc.coordinates.latitude, lng: loc.coordinates.longitude },
-                    map: map,
-                    title: loc.name
-                });
-                marker.addListener("click", () => mostrarDetalles(loc));
-
-                // Lógica de estado
-                const lastUpdate = new Date(loc.datetimeLast?.utc);
-                const diffHrs = (new Date() - lastUpdate) / (1000 * 60 * 60);
-                let estadoHTML = `<span class="status green">🟢 Activo</span>`;
-                
-                if (diffHrs > 24) {
-                    estadoHTML = `<span class="status red">🔴 Inactivo</span>`;
-                    alertas++;
-                }
-
-                // Inyectar Fila en la Tabla
-                const tr = document.createElement("tr");
-                tr.onclick = () => mostrarDetalles(loc);
-                tr.innerHTML = `
-                    <td>#${loc.id}</td>
-                    <td>${loc.name}</td>
-                    <td>${loc.country?.name || "N/A"}</td>
-                    <td>${new Date(loc.datetimeLast?.utc).toLocaleString()}</td>
-                    <td>${estadoHTML}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            document.getElementById("total-alerts").innerText = alertas;
-        }
-
-        // 4. Panel lateral y Gráficos creados SOLO CON CSS (Sin librerías)
-        function mostrarDetalles(loc) {
-            const panel = document.getElementById("panel-details");
-            
-            // Generamos alturas aleatorias para simular el gráfico de 7 barras sin usar Chart.js
-            const barrasCSS = Array.from({length: 7}).map(() => {
-                const altura = Math.floor(Math.random() * 100) + 10;
-                return `<div class="css-bar" style="height: ${altura}%;" title="${altura}%"></div>`;
-            }).join('');
-
-            const sensoresHTML = loc.sensors ? loc.sensors.map(s => `<li>${s.parameter.displayName} (${s.parameter.units})</li>`).join('') : "<li>Sin sensores reportados</li>";
-
-            panel.innerHTML = `
+            <div class="panel-content">
                 <div class="detail-group">
                     <h4>UBICACIÓN:</h4>
-                    <p>${loc.name}, ${loc.country?.name || "Desconocido"}</p>
+                    <p>Estación UTEQ (Simulación), Ecuador</p>
                 </div>
                 <div class="detail-group">
                     <h4>SENSORES DISPONIBLES:</h4>
-                    <ul>${sensoresHTML}</ul>
+                    <ul>
+                        <li>PM2.5 (µg/m³)</li>
+                        <li>CO2 (ppm)</li>
+                        <li>Temperatura (DHT22)</li>
+                    </ul>
                 </div>
                 
                 <div class="detail-group">
                     <h4>GRÁFICOS RESUMIDOS (Histórico Puro CSS):</h4>
+                    <!-- Gráfico simulado con alturas predefinidas en CSS -->
                     <div class="pure-css-chart-container">
-                        ${barrasCSS}
+                        <div class="css-bar" style="height: 40%;" title="40%"></div>
+                        <div class="css-bar" style="height: 85%;" title="85%"></div>
+                        <div class="css-bar" style="height: 30%;" title="30%"></div>
+                        <div class="css-bar" style="height: 65%;" title="65%"></div>
+                        <div class="css-bar" style="height: 90%;" title="90%"></div>
+                        <div class="css-bar" style="height: 50%;" title="50%"></div>
+                        <div class="css-bar" style="height: 75%;" title="75%"></div>
                     </div>
-                    <p class="chart-label">Últimas lecturas (Mocked)</p>
+                    <p class="chart-label">Últimas lecturas (Estático)</p>
                 </div>
-            `;
-        }
-    </script>
+            </div>
+        </aside>
+    </div>
+
 </body>
 </html>
